@@ -1,7 +1,6 @@
-// ============================================
-// 데이터 레이어
-// Supabase 모드(env 설정 시) ↔ localStorage 폴백 모드를 동일한 API 로 추상화.
-// 호스팅 확정 후 .env 채우고 supabase/schema.sql 적용하면 자동으로 Supabase 사용.
+﻿// ============================================
+// ?곗씠???덉씠??// Supabase 紐⑤뱶(env ?ㅼ젙 ?? ??localStorage ?대갚 紐⑤뱶瑜??숈씪??API 濡?異붿긽??
+// ?몄뒪???뺤젙 ??.env 梨꾩슦怨?supabase/schema.sql ?곸슜?섎㈃ ?먮룞?쇰줈 Supabase ?ъ슜.
 // ============================================
 
 import type { Asset, FixRun, Notice, Resource, Scan, Threat } from '../types'
@@ -13,7 +12,7 @@ const LS_FIXES = 'kdnvuln_fixes'
 const LS_NOTICES = 'kdnvuln_notices'
 const LS_THREATS = 'kdnvuln_threats'
 const LS_RESOURCES = 'kdnvuln_resources'
-const RESOURCE_BUCKET = 'resources'
+const RESOURCE_BUCKET = 'kdn03_resources'
 
 function uid(): string {
   return (crypto.randomUUID?.() ?? `id-${Date.now()}-${Math.random().toString(36).slice(2)}`)
@@ -30,7 +29,7 @@ function lsWrite<T>(key: string, val: T[]): void {
   localStorage.setItem(key, JSON.stringify(val))
 }
 
-// ── Supabase row <-> 도메인 매핑 ──
+// ?? Supabase row <-> ?꾨찓??留ㅽ븨 ??
 /* eslint-disable @typescript-eslint/no-explicit-any */
 function assetFromRow(r: any): Asset {
   return {
@@ -130,7 +129,7 @@ export const db = {
 
   async listAssets(): Promise<Asset[]> {
     if (supabase) {
-      const { data, error } = await supabase.from('assets').select('*').order('hostname')
+      const { data, error } = await supabase.from('kdn03_assets').select('*').order('hostname')
       if (error) throw error
       return (data ?? []).map(assetFromRow)
     }
@@ -139,7 +138,7 @@ export const db = {
 
   async getAsset(id: string): Promise<Asset | null> {
     if (supabase) {
-      const { data, error } = await supabase.from('assets').select('*').eq('id', id).maybeSingle()
+      const { data, error } = await supabase.from('kdn03_assets').select('*').eq('id', id).maybeSingle()
       if (error) throw error
       return data ? assetFromRow(data) : null
     }
@@ -148,7 +147,7 @@ export const db = {
 
   async createAsset(input: Omit<Asset, 'id' | 'createdAt'>): Promise<Asset> {
     if (supabase) {
-      const { data, error } = await supabase.from('assets').insert(assetToRow(input)).select().single()
+      const { data, error } = await supabase.from('kdn03_assets').insert(assetToRow(input)).select().single()
       if (error) throw error
       return assetFromRow(data)
     }
@@ -161,7 +160,7 @@ export const db = {
 
   async updateAsset(id: string, input: Partial<Asset>): Promise<void> {
     if (supabase) {
-      const { error } = await supabase.from('assets').update(assetToRow(input)).eq('id', id)
+      const { error } = await supabase.from('kdn03_assets').update(assetToRow(input)).eq('id', id)
       if (error) throw error
       return
     }
@@ -175,7 +174,7 @@ export const db = {
 
   async deleteAsset(id: string): Promise<void> {
     if (supabase) {
-      const { error } = await supabase.from('assets').delete().eq('id', id)
+      const { error } = await supabase.from('kdn03_assets').delete().eq('id', id)
       if (error) throw error
       return
     }
@@ -187,7 +186,7 @@ export const db = {
   // ============================================
   async listScans(): Promise<Scan[]> {
     if (supabase) {
-      const { data, error } = await supabase.from('scans').select('*').order('scan_date', { ascending: false })
+      const { data, error } = await supabase.from('kdn03_scans').select('*').order('scan_date', { ascending: false })
       if (error) throw error
       return (data ?? []).map(scanFromRow)
     }
@@ -196,7 +195,7 @@ export const db = {
 
   async getScan(id: string): Promise<Scan | null> {
     if (supabase) {
-      const { data, error } = await supabase.from('scans').select('*').eq('id', id).maybeSingle()
+      const { data, error } = await supabase.from('kdn03_scans').select('*').eq('id', id).maybeSingle()
       if (error) throw error
       return data ? scanFromRow(data) : null
     }
@@ -205,7 +204,7 @@ export const db = {
 
   async createScan(scan: Scan): Promise<Scan> {
     if (supabase) {
-      const { data, error } = await supabase.from('scans').insert(scanToRow(scan)).select().single()
+      const { data, error } = await supabase.from('kdn03_scans').insert(scanToRow(scan)).select().single()
       if (error) throw error
       return scanFromRow(data)
     }
@@ -217,7 +216,7 @@ export const db = {
 
   async deleteScan(id: string): Promise<void> {
     if (supabase) {
-      const { error } = await supabase.from('scans').delete().eq('id', id)
+      const { error } = await supabase.from('kdn03_scans').delete().eq('id', id)
       if (error) throw error
       return
     }
@@ -225,11 +224,11 @@ export const db = {
   },
 
   // ============================================
-  // Fixes (조치 이력)
+  // Fixes (議곗튂 ?대젰)
   // ============================================
   async listFixes(): Promise<FixRun[]> {
     if (supabase) {
-      const { data, error } = await supabase.from('fixes').select('*').order('fix_date', { ascending: false })
+      const { data, error } = await supabase.from('kdn03_fixes').select('*').order('fix_date', { ascending: false })
       if (error) throw error
       return (data ?? []).map(fixFromRow)
     }
@@ -238,7 +237,7 @@ export const db = {
 
   async getFix(id: string): Promise<FixRun | null> {
     if (supabase) {
-      const { data, error } = await supabase.from('fixes').select('*').eq('id', id).maybeSingle()
+      const { data, error } = await supabase.from('kdn03_fixes').select('*').eq('id', id).maybeSingle()
       if (error) throw error
       return data ? fixFromRow(data) : null
     }
@@ -247,7 +246,7 @@ export const db = {
 
   async createFix(fix: FixRun): Promise<FixRun> {
     if (supabase) {
-      const { data, error } = await supabase.from('fixes').insert(fixToRow(fix)).select().single()
+      const { data, error } = await supabase.from('kdn03_fixes').insert(fixToRow(fix)).select().single()
       if (error) throw error
       return fixFromRow(data)
     }
@@ -259,7 +258,7 @@ export const db = {
 
   async deleteFix(id: string): Promise<void> {
     if (supabase) {
-      const { error } = await supabase.from('fixes').delete().eq('id', id)
+      const { error } = await supabase.from('kdn03_fixes').delete().eq('id', id)
       if (error) throw error
       return
     }
@@ -267,11 +266,11 @@ export const db = {
   },
 
   // ============================================
-  // Notices (보안 공지사항)
+  // Notices (蹂댁븞 怨듭??ы빆)
   // ============================================
   async listNotices(): Promise<Notice[]> {
     if (supabase) {
-      const { data, error } = await supabase.from('notices')
+      const { data, error } = await supabase.from('kdn03_notices')
         .select('*').order('pinned', { ascending: false }).order('created_at', { ascending: false })
       if (error) throw error
       return (data ?? []).map(noticeFromRow)
@@ -282,7 +281,7 @@ export const db = {
 
   async getNotice(id: string): Promise<Notice | null> {
     if (supabase) {
-      const { data, error } = await supabase.from('notices').select('*').eq('id', id).maybeSingle()
+      const { data, error } = await supabase.from('kdn03_notices').select('*').eq('id', id).maybeSingle()
       if (error) throw error
       return data ? noticeFromRow(data) : null
     }
@@ -291,7 +290,7 @@ export const db = {
 
   async createNotice(input: Omit<Notice, 'id' | 'views' | 'createdAt' | 'updatedAt'>): Promise<Notice> {
     if (supabase) {
-      const { data, error } = await supabase.from('notices').insert(noticeToRow(input)).select().single()
+      const { data, error } = await supabase.from('kdn03_notices').insert(noticeToRow(input)).select().single()
       if (error) throw error
       return noticeFromRow(data)
     }
@@ -305,7 +304,7 @@ export const db = {
 
   async updateNotice(id: string, input: Partial<Notice>): Promise<void> {
     if (supabase) {
-      const { error } = await supabase.from('notices').update(noticeToRow(input)).eq('id', id)
+      const { error } = await supabase.from('kdn03_notices').update(noticeToRow(input)).eq('id', id)
       if (error) throw error
       return
     }
@@ -316,17 +315,17 @@ export const db = {
 
   async deleteNotice(id: string): Promise<void> {
     if (supabase) {
-      const { error } = await supabase.from('notices').delete().eq('id', id)
+      const { error } = await supabase.from('kdn03_notices').delete().eq('id', id)
       if (error) throw error
       return
     }
     lsWrite(LS_NOTICES, lsRead<Notice>(LS_NOTICES).filter((n) => n.id !== id))
   },
 
-  /** 조회수 +1 (best-effort) */
+  /** 議고쉶??+1 (best-effort) */
   async bumpNoticeViews(id: string, current: number): Promise<void> {
     if (supabase) {
-      await supabase.from('notices').update({ views: current + 1 }).eq('id', id)
+      await supabase.from('kdn03_notices').update({ views: current + 1 }).eq('id', id)
       return
     }
     const all = lsRead<Notice>(LS_NOTICES)
@@ -335,11 +334,11 @@ export const db = {
   },
 
   // ============================================
-  // Threats (보안 동향 · CVE)
+  // Threats (蹂댁븞 ?숉뼢 쨌 CVE)
   // ============================================
   async listThreats(): Promise<Threat[]> {
     if (supabase) {
-      const { data, error } = await supabase.from('threats').select('*').order('created_at', { ascending: false })
+      const { data, error } = await supabase.from('kdn03_threats').select('*').order('created_at', { ascending: false })
       if (error) throw error
       return (data ?? []).map(threatFromRow)
     }
@@ -348,7 +347,7 @@ export const db = {
 
   async getThreat(id: string): Promise<Threat | null> {
     if (supabase) {
-      const { data, error } = await supabase.from('threats').select('*').eq('id', id).maybeSingle()
+      const { data, error } = await supabase.from('kdn03_threats').select('*').eq('id', id).maybeSingle()
       if (error) throw error
       return data ? threatFromRow(data) : null
     }
@@ -357,7 +356,7 @@ export const db = {
 
   async createThreat(input: Omit<Threat, 'id' | 'views' | 'createdAt' | 'updatedAt'>): Promise<Threat> {
     if (supabase) {
-      const { data, error } = await supabase.from('threats').insert(threatToRow(input)).select().single()
+      const { data, error } = await supabase.from('kdn03_threats').insert(threatToRow(input)).select().single()
       if (error) throw error
       return threatFromRow(data)
     }
@@ -371,7 +370,7 @@ export const db = {
 
   async updateThreat(id: string, input: Partial<Threat>): Promise<void> {
     if (supabase) {
-      const { error } = await supabase.from('threats').update(threatToRow(input)).eq('id', id)
+      const { error } = await supabase.from('kdn03_threats').update(threatToRow(input)).eq('id', id)
       if (error) throw error
       return
     }
@@ -382,7 +381,7 @@ export const db = {
 
   async deleteThreat(id: string): Promise<void> {
     if (supabase) {
-      const { error } = await supabase.from('threats').delete().eq('id', id)
+      const { error } = await supabase.from('kdn03_threats').delete().eq('id', id)
       if (error) throw error
       return
     }
@@ -391,7 +390,7 @@ export const db = {
 
   async bumpThreatViews(id: string, current: number): Promise<void> {
     if (supabase) {
-      await supabase.from('threats').update({ views: current + 1 }).eq('id', id)
+      await supabase.from('kdn03_threats').update({ views: current + 1 }).eq('id', id)
       return
     }
     const all = lsRead<Threat>(LS_THREATS)
@@ -400,11 +399,11 @@ export const db = {
   },
 
   // ============================================
-  // Resources (자료실) — Supabase Storage 연동
+  // Resources (?먮즺?? ??Supabase Storage ?곕룞
   // ============================================
   async listResources(): Promise<Resource[]> {
     if (supabase) {
-      const { data, error } = await supabase.from('resources').select('*').order('created_at', { ascending: false })
+      const { data, error } = await supabase.from('kdn03_resources').select('*').order('created_at', { ascending: false })
       if (error) throw error
       return (data ?? []).map(resourceFromRow)
     }
@@ -413,14 +412,14 @@ export const db = {
 
   async getResource(id: string): Promise<Resource | null> {
     if (supabase) {
-      const { data, error } = await supabase.from('resources').select('*').eq('id', id).maybeSingle()
+      const { data, error } = await supabase.from('kdn03_resources').select('*').eq('id', id).maybeSingle()
       if (error) throw error
       return data ? resourceFromRow(data) : null
     }
     return lsRead<Resource>(LS_RESOURCES).find((r) => r.id === id) ?? null
   },
 
-  /** 파일 업로드 → { filePath, fileUrl }. Supabase: Storage 버킷 / 로컬: data URL */
+  /** ?뚯씪 ?낅줈????{ filePath, fileUrl }. Supabase: Storage 踰꾪궥 / 濡쒖뺄: data URL */
   async uploadResourceFile(file: File): Promise<{ filePath: string; fileUrl: string }> {
     if (supabase) {
       const safe = file.name.replace(/[^\w.\-]/g, '_')
@@ -435,7 +434,7 @@ export const db = {
     const fileUrl = await new Promise<string>((res, rej) => {
       const r = new FileReader()
       r.onload = () => res(r.result as string)
-      r.onerror = () => rej(new Error('파일 읽기 실패'))
+      r.onerror = () => rej(new Error('?뚯씪 ?쎄린 ?ㅽ뙣'))
       r.readAsDataURL(file)
     })
     return { filePath: '', fileUrl }
@@ -443,7 +442,7 @@ export const db = {
 
   async createResource(input: Omit<Resource, 'id' | 'downloads' | 'createdAt' | 'updatedAt'>): Promise<Resource> {
     if (supabase) {
-      const { data, error } = await supabase.from('resources').insert(resourceToRow(input)).select().single()
+      const { data, error } = await supabase.from('kdn03_resources').insert(resourceToRow(input)).select().single()
       if (error) throw error
       return resourceFromRow(data)
     }
@@ -458,7 +457,7 @@ export const db = {
   async deleteResource(r: Resource): Promise<void> {
     if (supabase) {
       if (r.filePath) await supabase.storage.from(RESOURCE_BUCKET).remove([r.filePath]).catch(() => {})
-      const { error } = await supabase.from('resources').delete().eq('id', r.id)
+      const { error } = await supabase.from('kdn03_resources').delete().eq('id', r.id)
       if (error) throw error
       return
     }
@@ -467,7 +466,7 @@ export const db = {
 
   async bumpResourceDownloads(id: string, current: number): Promise<void> {
     if (supabase) {
-      await supabase.from('resources').update({ downloads: current + 1 }).eq('id', id)
+      await supabase.from('kdn03_resources').update({ downloads: current + 1 }).eq('id', id)
       return
     }
     const all = lsRead<Resource>(LS_RESOURCES)
@@ -476,7 +475,7 @@ export const db = {
   },
 }
 
-/** 최신 점검만 자산별로 추출 (취약점 현황/대시보드 집계용) */
+/** 理쒖떊 ?먭?留??먯궛蹂꾨줈 異붿텧 (痍⑥빟???꾪솴/??쒕낫??吏묎퀎?? */
 export function latestScanPerAsset(scans: Scan[]): Scan[] {
   const byKey = new Map<string, Scan>()
   for (const s of scans) {
